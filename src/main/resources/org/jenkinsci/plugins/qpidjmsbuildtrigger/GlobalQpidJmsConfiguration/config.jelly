@@ -1,0 +1,42 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:section title="${%Qpid JMS Build Trigger}">
+    <script type="text/javascript">
+      function checkConnection() {
+        var descriptor = <st:bind value="${descriptor}" />
+        descriptor.isOpen(function (t) {
+          if(t.responseObject() == true) {
+            document.getElementById('qpidjms-status-text').innerHTML = "${%connected}";
+            document.getElementById('qpidjms-status-img').src = "${imagesURL}/16x16/blue.png";
+          } else {
+            document.getElementById('qpidjms-status-text').innerHTML = "${%disconnected}";
+            document.getElementById('qpidjms-status-img').src = "${imagesURL}/16x16/red.png";
+          }
+        });
+      }
+      checkConnection();
+      window.setInterval(function(){checkConnection()}, 15000);
+    </script>
+    <f:entry title="${%Enable}" field="enableFlag">
+      <f:checkbox />
+    </f:entry>
+    <f:entry title="${%Status}">
+      <img id="qpidjms-status-img" /><span id="qpidjms-status-text" />
+    </f:entry>
+    <f:entry title="${%Broker URI}" field="brokerUri">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%Username}" field="userName">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%Password}" field="userPassword">
+      <f:password />
+    </f:entry>
+    <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="brokerUri,userName,userPassword" />
+    <f:advanced>
+      <f:entry title="${%Enable debug}" field="enableDebug">
+        <f:checkbox />
+      </f:entry>
+    </f:advanced>
+  </f:section>
+</j:jelly>

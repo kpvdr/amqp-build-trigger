@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    This plugin connects to an AMQP broker, receive messages from a queue, then triggers builds based on the message content.
+</div>
