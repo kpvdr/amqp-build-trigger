@@ -36,16 +36,6 @@ public class RemoteBuildListener extends MessageQueueListener {
     }
     
     @Override
-    public void onBind(String queueName) {
-    	LOGGER.info("Bind to: " + queueName);
-    }
-    
-    @Override
-    public void onUnbind(String queueName) {
-        LOGGER.info("Unbind from: " + queueName);
-    }
-    
-    @Override
     public void onReceive(String queueName, String contentType, Map<String, Object> headers, byte[] body) {
         if (CONTENT_TYPE_JSON.equals(contentType)) {
             try {

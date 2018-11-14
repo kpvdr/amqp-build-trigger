@@ -17,7 +17,7 @@
       checkConnection();
       window.setInterval(function(){checkConnection()}, 15000);
     </script>
-    <f:entry title="${%Enable}" field="enableFlag">
+    <f:entry title="${%Enable}" field="enabledFlag">
       <f:checkbox />
     </f:entry>
     <f:entry title="${%Status}">

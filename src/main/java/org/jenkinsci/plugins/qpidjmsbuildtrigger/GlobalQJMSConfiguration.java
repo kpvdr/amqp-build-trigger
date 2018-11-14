@@ -26,30 +26,30 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 @Extension
-public class GlobalQpidJmsConfiguration extends GlobalConfiguration {
+public class GlobalQJMSConfiguration extends GlobalConfiguration {
 
     private static final String PLUGIN_NAME = null;
     //private static final Logger LOGGER = Logger.getLogger(GlobalQpidJmsConfiguration.class.getName());
     //private static final String[] AMQP_SCHEMES = { "amqp", "amqps" };
     //private final UrlValidator urlValidator = new UrlValidator(AMQP_SCHEMES, UrlValidator.ALLOW_LOCAL_URLS);
     
-	private boolean enableFlag;
+	private boolean enabledFlag;
     private String brokerUri;
     private String userName;
     private Secret userPassword;
     private boolean enableDebug;
 
     @DataBoundConstructor
-    public GlobalQpidJmsConfiguration(boolean enableFlag, String brokerUri, String userName, Secret userPassword,
+    public GlobalQJMSConfiguration(boolean enableFlag, String brokerUri, String userName, Secret userPassword,
     		boolean enableDebug) {
-        this.enableFlag = enableFlag;
+        this.enabledFlag = enableFlag;
         this.brokerUri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
         this.userName = userName;
         this.userPassword = userPassword;    	
         this.enableDebug = enableDebug;
     }
     
-    public GlobalQpidJmsConfiguration() {
+    public GlobalQJMSConfiguration() {
         load();
     }
 
@@ -76,12 +76,12 @@ public class GlobalQpidJmsConfiguration extends GlobalConfiguration {
         this.enableDebug = enableDebug;
     }
     
-    public boolean isEnableFlag() {
-        return enableFlag;
+    public boolean isEnabledFlag() {
+        return enabledFlag;
     }
     
-    public void setEnableFlag(boolean enableFlag) {
-        this.enableFlag = enableFlag;
+    public void setEnabledFlag(boolean enableFlag) {
+        this.enabledFlag = enableFlag;
     }
     
     public String getBrokerUri() {
@@ -134,12 +134,10 @@ public class GlobalQpidJmsConfiguration extends GlobalConfiguration {
         if (uri != null /*&& urlValidator.isValid(uri)*/) {
             try {
             	ConnectionFactory factory = (ConnectionFactory)new JmsConnectionFactory(uri);
-            	//ConnectionFactory factory = (ConnectionFactory) context.lookup("myFactoryLookup");
-            	
             	Connection connection = factory.createConnection(userName, userPassword.getPlainText());
             	connection.setExceptionListener(new MyExceptionListener());
             	connection.start();
-            	// Get connection properties
+            	// TODO: Get connection properties
             	connection.close();
                 return FormValidation.ok("ok");
             } catch (javax.jms.JMSException e) {
@@ -149,8 +147,8 @@ public class GlobalQpidJmsConfiguration extends GlobalConfiguration {
         return FormValidation.error("Invalid Broker URL");
     }
     
-    public static GlobalQpidJmsConfiguration get() {
-        return GlobalConfiguration.all().get(GlobalQpidJmsConfiguration.class);
+    public static GlobalQJMSConfiguration get() {
+        return GlobalConfiguration.all().get(GlobalQJMSConfiguration.class);
     }
 
     private static class MyExceptionListener implements ExceptionListener {
