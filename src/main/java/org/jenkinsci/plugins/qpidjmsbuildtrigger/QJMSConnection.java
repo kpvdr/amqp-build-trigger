@@ -3,15 +3,13 @@ package org.jenkinsci.plugins.qpidjmsbuildtrigger;
 import java.io.IOException;
 import java.util.logging.Logger;
 import javax.jms.Connection;
-//import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
+import javax.jms.Session;
 
 import hudson.util.Secret;
 import org.apache.qpid.jms.JmsConnection;
 import org.apache.qpid.jms.JmsConnectionFactory;
-
-// TEST CODE
-import javax.jms.ExceptionListener;
 
 public class QJMSConnection {
     private static final Logger LOGGER = Logger.getLogger(QJMSConnection.class.getName());
@@ -28,7 +26,7 @@ public class QJMSConnection {
         this.userName = userName;
         this.userPassword = userPassword;
         LOGGER.info("Broker URL: " + brokerUri);
-        factory = new JmsConnectionFactory("failover:(" + brokerUri + ")?failover.maxReconnectAttempts=10&amqp.saslLayer=false");
+        factory = new JmsConnectionFactory(brokerUri);
     }
     
     public Connection getConnection() {
@@ -80,6 +78,10 @@ public class QJMSConnection {
         } catch (JMSException e) {
         	LOGGER.warning("Failed to close connection: " + e.getMessage());
         }
+    }
+    
+    public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    	return connection.createSession(transacted, acknowledgeMode);
     }
     
     private static class MyExceptionListener implements ExceptionListener {

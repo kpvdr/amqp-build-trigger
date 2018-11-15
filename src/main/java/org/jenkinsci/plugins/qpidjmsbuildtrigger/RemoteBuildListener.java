@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.jms.Message;
+import javax.jms.MessageListener;
 
 import org.jenkinsci.plugins.qpidjmsbuildtrigger.extensions.MessageQueueListener;
 
@@ -15,7 +17,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 @Extension
-public class RemoteBuildListener extends MessageQueueListener {
+public class RemoteBuildListener extends MessageQueueListener implements MessageListener {
     private static final String CONTENT_TYPE_JSON = "application/json";
     private static final String KEY_PROJECT = "project";
     private static final String KEY_TOKEN = "token";
@@ -68,6 +70,11 @@ public class RemoteBuildListener extends MessageQueueListener {
         }    	
     }
 
+    @Override
+    public void onMessage(Message message) {
+    	LOGGER.info("onMessage() m=" + message.toString());
+    }
+    
     public void addTrigger(RemoteBuildTrigger trigger) {
         triggers.add(trigger);
     }

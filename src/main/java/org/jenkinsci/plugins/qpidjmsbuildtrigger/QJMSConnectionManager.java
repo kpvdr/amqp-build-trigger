@@ -5,8 +5,10 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 
 import hudson.util.Secret;
@@ -19,6 +21,8 @@ public class QJMSConnectionManager implements JmsConnectionListener {
 
     private boolean connectedFlag = false;
 	private QJMSConnection connection = null;
+	private Session session = null;
+	private Queue queue = null;
 	
     private static class InstanceHolder {
         private static final QJMSConnectionManager INSTANCE = new QJMSConnectionManager();
@@ -34,6 +38,11 @@ public class QJMSConnectionManager implements JmsConnectionListener {
 	public void onConnectionEstablished(URI remoteURI) {
 		LOGGER.info(remoteURI + ": Connection established");
 		connectedFlag = true;
+		try {
+			createSession("qit.QJMSTestQueue");
+		} catch (JMSException e) {
+			LOGGER.severe("Unable to create session: " + e.getMessage());
+		}
 	}
 
 	@Override
@@ -95,8 +104,11 @@ public class QJMSConnectionManager implements JmsConnectionListener {
 
         if (enabledFlag) {
             if (connection == null) {
-            	//connection = new QJMSConnection("failover:(" + brokerUri + ")?failover.maxReconnectAttempts=10&amqp.saslLayer=false", user, pass);
-            	connection = new QJMSConnection(brokerUri, user, pass);
+            	if (conf.isEnableDebug()) {
+            		connection = new QJMSConnection(brokerUri + "?amqp.traceFrames=true", user, pass);
+            	} else {
+            		connection = new QJMSConnection(brokerUri, user, pass);
+            	}
                 try {
                 	connection.open();
                 } catch (IOException e) {
@@ -116,5 +128,10 @@ public class QJMSConnectionManager implements JmsConnectionListener {
             	connection = null;
             }
         }
+    }
+    
+    private void createSession(String queueName) throws JMSException {
+    	session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    	queue = session.createQueue(queueName);
     }
 }
