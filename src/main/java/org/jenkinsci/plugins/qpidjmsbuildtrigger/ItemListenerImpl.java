@@ -8,11 +8,11 @@ import hudson.model.listeners.ItemListener;
 @Extension
 public class ItemListenerImpl extends ItemListener {
     private static final Logger LOGGER = Logger.getLogger(ItemListenerImpl.class.getName());
-    private final QJMSConnectionManager manager;
+    private final ConnectionManager manager;
     
     public ItemListenerImpl() {
         super();
-        this.manager = QJMSConnectionManager.getInstance();
+        this.manager = ConnectionManager.getInstance();
     }
     
     @Override

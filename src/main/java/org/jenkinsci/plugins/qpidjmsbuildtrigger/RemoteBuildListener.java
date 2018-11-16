@@ -1,78 +1,89 @@
 package org.jenkinsci.plugins.qpidjmsbuildtrigger;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
 import org.jenkinsci.plugins.qpidjmsbuildtrigger.extensions.MessageQueueListener;
 
 import hudson.Extension;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 @Extension
 public class RemoteBuildListener extends MessageQueueListener implements MessageListener {
-    private static final String CONTENT_TYPE_JSON = "application/json";
-    private static final String KEY_PROJECT = "project";
-    private static final String KEY_TOKEN = "token";
-    private static final String KEY_PARAMETER = "parameter";
-    private static final String PLUGIN_NAME = "Remote Builder";
+	private static final String MSG_TYPE_KEY = "msg_type";
+	private static final String MSG_TYPE_VALUE = "QJMS_build_trigger";
+	private static final String PROJ_TOKEN_KEY = "jenkins_project_token";
+	private static final String PROJ_ACTION_KEY = "jenkins_project_action";
+	private static final String PROJ_ACTION_BUILD_VALUE = "build";
     
     private static final Logger LOGGER = Logger.getLogger(RemoteBuildTrigger.class.getName());
     private final Set<RemoteBuildTrigger> triggers = new CopyOnWriteArraySet<RemoteBuildTrigger>();
-    
-    @Override
-    public String getName() {
-    	return PLUGIN_NAME;
-    }
-    
-    @Override
-    public String getAppId() {
-    	return RemoteBuildTrigger.PLUGIN_APPID;
-    }
-    
-    @Override
-    public void onReceive(String queueName, String contentType, Map<String, Object> headers, byte[] body) {
-        if (CONTENT_TYPE_JSON.equals(contentType)) {
-            try {
-                String msg = new String(body, "UTF-8");
-                try {
-                    JSONObject json = (JSONObject) JSONSerializer.toJSON(msg);
-                    for (RemoteBuildTrigger t : triggers) {
+    private String queueName;
 
-                        if (t.getRemoteBuildToken() == null) {
-                            LOGGER.log(Level.WARNING, "ignoring AMQP trigger for project {0}: no token set", t.getProjectName());
+    public RemoteBuildListener() {}
+    
+    public RemoteBuildListener(String queueName) {
+    	this.queueName = queueName;
+    }
+    
+    public void setQueueName(String queueName) {
+    	this.queueName = queueName;
+    }
+    
+    @Override
+    public void onReceive(Message msg) {
+    	System.out.println("onReceive()");
+    	try {
+    		String msgType = getMessageProperty(msg, MSG_TYPE_KEY);
+    		String projToken = getMessageProperty(msg, PROJ_TOKEN_KEY);
+    		String projAction = getMessageProperty(msg, PROJ_ACTION_KEY);
+    		if (msgType != null && projToken != null && projAction != null) {
+    			if (msgType.equals(MSG_TYPE_VALUE)) {
+                    for (RemoteBuildTrigger t : triggers) {
+                    	if (t.getRemoteBuildToken() == null) {
+                            LOGGER.log(Level.WARNING, "Ignoring AMQP trigger for project {0}: no token set", t.getProjectName());
                             continue;
                         }
-
-                        if (t.getProjectName().equals(json.getString(KEY_PROJECT))
-                                && t.getRemoteBuildToken().equals(json.getString(KEY_TOKEN))) {
-                            if (json.containsKey(KEY_PARAMETER)) {
-                                t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
-                            } else {
-                                t.scheduleBuild(queueName, null);
-                            }
-                        }
-                    }
-                } catch (JSONException e) {
-                    LOGGER.warning("JSON format string: " + msg);
-                    LOGGER.warning(e.getMessage());
-                }
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.warning("Unsupported encoding. Is message body is not string?");
-            }
-        }    	
+                    	if (projToken.equals(t.getRemoteBuildToken()) && projAction.equals(PROJ_ACTION_BUILD_VALUE)) {
+                    		LOGGER.info("Remote build triggered: message received: " + 
+                                         MSG_TYPE_KEY + "=\"" + MSG_TYPE_VALUE + "\", " +
+                    				     PROJ_TOKEN_KEY + "=\"" + t.getRemoteBuildToken() + "\", " +
+                                         PROJ_ACTION_KEY + "=\"" + PROJ_ACTION_BUILD_VALUE + "\"");
+                    		t.scheduleBuild(queueName, null);
+                    	}
+                    }    				
+    			} else {
+    				LOGGER.warning("Incoming message discarded: propoerty \"" + MSG_TYPE_KEY + "\" value \"" + msgType + "\" not recognized");
+    			}
+    		} else {
+    			LOGGER.warning("Incoming message discarded: missing required propoerties");
+    		}
+    	} catch (JMSException e) {
+    		LOGGER.warning("Error handling incoming message: " + e.getMessage());
+    	}
     }
-
+    
+    private String getMessageProperty(Message message, String propKey) throws JMSException {
+    	String p = message.getStringProperty(propKey);
+    	if (p == null) {
+    		LOGGER.info("Incoming message: no property \"" + propKey + "\"");
+    	}
+    	return p;
+    }
+    
     @Override
     public void onMessage(Message message) {
-    	LOGGER.info("onMessage() m=" + message.toString());
+    	try {
+    		LOGGER.info("onMessage() m=" + message.toString());
+    		fireOnReceive(message);
+    	} catch (Exception e) {
+    		LOGGER.warning("Exception thrown in RemoteBuildListener.onMessage(): " + e.getMessage());
+    	}
     }
     
     public void addTrigger(RemoteBuildTrigger trigger) {

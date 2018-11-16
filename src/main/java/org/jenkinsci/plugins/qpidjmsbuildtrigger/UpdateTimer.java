@@ -37,9 +37,8 @@ public class UpdateTimer extends AperiodicWork {
 
 	@Override
 	protected void doAperiodicRun() {
-		System.out.println("*** UpdateTimer.doAperiodicRun() stopRequested=" + stopRequested);
         if (!stopRequested) {
-        	QJMSConnectionManager.getInstance().update();
+        	ConnectionManager.getInstance().update();
         }
 	}
 
