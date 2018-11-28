@@ -1,5 +1,5 @@
 # Qpid JMS Build Trigger for Jenkins
-This Jenkins plugin adds a build trigger for Jenkins. It will trigger builds based on JMS messages received from a broker on a queue named `build-trigger-queue`. Any JMS message containing the following properties will trigger a build:
+This Jenkins plugin adds a build trigger for Jenkins. It will trigger builds based on JMS messages received from a broker on a queue named `qjbt.trigger-queue`. Any JMS message containing the following properties will trigger a build:
 
 * `msg_type` = `QJMS_build_trigger`
 * `jenkins_project_action` = `build`
@@ -43,3 +43,10 @@ Scroll down to the **Build Triggers** section.
 
 **NOTE:** The same token may be used by several projects. When an incoming message matches the token, then all the projects using that token will be triggered together. The order of triggering is not guaranteed, however. If ordering is important, then sparate trigger tokens will be needed and each triggered using a separate message.
 
+**NOTE:** It is possible to perform a simple test of the trigger by using the maven command `mvn hpi:run` from the project top level directory. This will start a simplified version of Jenkins on a Jetty server instance, and the trigger plugin will be installed and running. Only Freestyle projects are available, but it makes for a quick and easy way of testing the trigger. The web interface will be available on `localhost:8080/jenkins`, and all jenkins logs, project files, etc. will be located in the project top-level directory under `work`.
+
+**NOTE:** It is possible to quickly send trigger messages using `qpid-send` as follows:
+```
+qpid-send -a qjbt.trigger-queue -m1 -P msg_type="QJMS_build_trigger" -P jenkins_project_action="build" -P jenkins_project_token="<your test token>"
+```
+where `<your test token>` is replaced by the token string set up in the per-project section above.

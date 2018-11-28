@@ -20,7 +20,7 @@ import org.apache.qpid.jms.message.JmsInboundMessageDispatch;
 
 public class ConnectionManager implements JmsConnectionListener {
     private static final Logger LOGGER = Logger.getLogger(ConnectionManager.class.getName());
-    private static final String QUEUE_NAME = "build-trigger-queue";
+    private static final String QUEUE_NAME = "qjbt.trigger-queue";
 
 	private JmsConnection connection = null;
 	private Session session = null;
