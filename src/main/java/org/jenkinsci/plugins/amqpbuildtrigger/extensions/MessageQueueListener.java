@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger.extensions;
+package org.jenkinsci.plugins.amqpbuildtrigger.extensions;
 
 import java.util.logging.Logger;
 import javax.jms.Message;

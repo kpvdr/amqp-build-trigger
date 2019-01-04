@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import hudson.Extension;
 import hudson.model.AperiodicWork;

@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 //import java.util.logging.Logger;
 
@@ -26,7 +26,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 @Extension
-public class GlobalQJMSConfiguration extends GlobalConfiguration {
+public class GlobalATConfiguration extends GlobalConfiguration {
 
     private static final String PLUGIN_NAME = null;
     //private static final Logger LOGGER = Logger.getLogger(GlobalQpidJmsConfiguration.class.getName());
@@ -40,7 +40,7 @@ public class GlobalQJMSConfiguration extends GlobalConfiguration {
     private boolean enableDebug;
 
     @DataBoundConstructor
-    public GlobalQJMSConfiguration(boolean enableFlag, String brokerUri, String userName, Secret userPassword,
+    public GlobalATConfiguration(boolean enableFlag, String brokerUri, String userName, Secret userPassword,
     		boolean enableDebug) {
         this.enabledFlag = enableFlag;
         this.brokerUri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
@@ -49,7 +49,7 @@ public class GlobalQJMSConfiguration extends GlobalConfiguration {
         this.enableDebug = enableDebug;
     }
     
-    public GlobalQJMSConfiguration() {
+    public GlobalATConfiguration() {
         load();
     }
 
@@ -61,6 +61,7 @@ public class GlobalQJMSConfiguration extends GlobalConfiguration {
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws hudson.model.Descriptor.FormException {
         req.bindJSON(this, json);
+        // TODO: (#2) Find an AMQP URL validator.
     	if (true) { // if (urlValidator.isValid(serviceUri)) {
     		save();
     		return true;
@@ -118,7 +119,7 @@ public class GlobalQJMSConfiguration extends GlobalConfiguration {
             return FormValidation.ok();
         }
 
-        // TODO: Validate URL
+        // TODO: (#2) Validate URL
         //if (urlValidator.isValid(val)) {
         //    return FormValidation.ok();
         //} else {
@@ -131,6 +132,7 @@ public class GlobalQJMSConfiguration extends GlobalConfiguration {
             @QueryParameter("userName") String userName,
             @QueryParameter("userPassword") Secret userPassword) throws ServletException {
         String uri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
+        // TODO: (#2) Validate URL
         if (uri != null /*&& urlValidator.isValid(uri)*/) {
             try {
             	ConnectionFactory factory = (ConnectionFactory)new JmsConnectionFactory(uri);
@@ -147,8 +149,8 @@ public class GlobalQJMSConfiguration extends GlobalConfiguration {
         return FormValidation.error("Invalid Broker URL");
     }
     
-    public static GlobalQJMSConfiguration get() {
-        return GlobalConfiguration.all().get(GlobalQJMSConfiguration.class);
+    public static GlobalATConfiguration get() {
+        return GlobalConfiguration.all().get(GlobalATConfiguration.class);
     }
 
     private static class MyExceptionListener implements ExceptionListener {

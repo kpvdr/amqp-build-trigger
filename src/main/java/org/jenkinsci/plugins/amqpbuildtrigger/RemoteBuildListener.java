@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -9,14 +9,14 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.jenkinsci.plugins.qpidjmsbuildtrigger.extensions.MessageQueueListener;
+import org.jenkinsci.plugins.amqpbuildtrigger.extensions.MessageQueueListener;
 
 import hudson.Extension;
 
 @Extension
 public class RemoteBuildListener extends MessageQueueListener implements MessageListener {
 	private static final String MSG_TYPE_KEY = "msg_type";
-	private static final String MSG_TYPE_VALUE = "QJMS_build_trigger";
+	private static final String MSG_TYPE_VALUE = "AMQP_build_trigger";
 	private static final String PROJ_TOKEN_KEY = "jenkins_project_token";
 	private static final String PROJ_ACTION_KEY = "jenkins_project_action";
 	private static final String PROJ_ACTION_BUILD_VALUE = "build";

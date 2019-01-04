@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.io.IOException;
 
@@ -58,7 +58,7 @@ public class RemoteBuildPublisher extends Notifier {
     	
         @Override
         public String getDisplayName() {
-            return "Publish result using QpidJMS";
+            return "Publish result using AMQP message";
         }
     }
 }

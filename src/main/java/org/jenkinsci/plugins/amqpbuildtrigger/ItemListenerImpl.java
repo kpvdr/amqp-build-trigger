@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.util.logging.Logger;
 
@@ -17,14 +17,14 @@ public class ItemListenerImpl extends ItemListener {
     
     @Override
     public final void onLoaded() {
-        LOGGER.info("Starting Qpid JMS Build Trigger");
+        LOGGER.info("Starting AMQP Build Trigger");
         manager.update();
         super.onLoaded();
     }
 
     @Override
     public final void onBeforeShutdown() {
-        LOGGER.info("Shutting down Qpid JMS Build Trigger");
+        LOGGER.info("Shutting down AMQP Build Trigger");
         manager.shutdown();
         super.onBeforeShutdown();
     }

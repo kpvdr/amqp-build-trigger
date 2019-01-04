@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
     
     private static final String KEY_PARAM_NAME = "name";
     private static final String KEY_PARAM_VALUE = "value";
-    private static final String PLUGIN_NAME = "Qpid JMS Build Trigger";
+    private static final String PLUGIN_NAME = "AMQP Build Trigger";
     
     private String remoteBuildToken;
     
@@ -136,7 +136,7 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
         return (DescriptorImpl) super.getDescriptor();
     }
     
-    @Extension @Symbol("qjmsRemoteBuild")
+    @Extension @Symbol("atRemoteBuild")
     public static class DescriptorImpl extends TriggerDescriptor {
 
         @Override

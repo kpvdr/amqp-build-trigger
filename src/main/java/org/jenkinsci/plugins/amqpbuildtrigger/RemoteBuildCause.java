@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import hudson.model.Cause;
 
@@ -15,7 +15,7 @@ public class RemoteBuildCause extends Cause {
 	@Override
     @Exported(visibility = 3)
 	public String getShortDescription() {
-		return "Triggered by remote build message from Qpid JMS queue: " + queueName;
+		return "Triggered by remote build message from AMQP queue: " + queueName;
 	}
 
 }

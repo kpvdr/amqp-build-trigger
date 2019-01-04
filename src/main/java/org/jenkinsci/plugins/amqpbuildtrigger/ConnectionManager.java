@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.qpidjmsbuildtrigger;
+package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.net.URI;
 import java.util.logging.Level;
@@ -82,7 +82,7 @@ public class ConnectionManager implements JmsConnectionListener {
 	}
 	
 	public void update() {
-		GlobalQJMSConfiguration conf = GlobalQJMSConfiguration.get();
+		GlobalATConfiguration conf = GlobalATConfiguration.get();
         String brokerUri = conf.getBrokerUri();
         String user = conf.getUserName();
         Secret pass = conf.getUserPassword();

@@ -1,7 +1,12 @@
-# Qpid JMS Build Trigger for Jenkins
-This Jenkins plugin adds a build trigger for Jenkins. It will trigger builds based on JMS messages received from a broker on a queue named `qjbt.trigger-queue`. Any JMS message containing the following properties will trigger a build:
+# AMQP Build Trigger for Jenkins
+This Jenkins plugin adds a build trigger for Jenkins. It will trigger builds based on AMQP messages received from a broker. There are two ways to use the trigger:
 
-* `msg_type` = `QJMS_build_trigger`
+* Global queue: A single global queue receives messages, and if the properties match those of the individual projects, a build is triggered.
+* Individual queues: Each project may name an individual queue, and **ANY** AMQP message received on that queue will trigger a build.
+
+For the global queue, any AMQP message containing the following properties will trigger a build:
+
+* `msg_type` = `AMQP_build_trigger`
 * `jenkins_project_action` = `build`
 * `jenkins_project_token` matches the token set for the individual project(s) to be triggered.
 
@@ -24,7 +29,7 @@ This sets up the address of the AMQP broker from which trigger messages will be 
 
 The global configuration can be found at **Manage Jenkins** -> **Configure System**
 
-Scroll down to the **Qpid JMS Build Trigger** section:
+Scroll down to the **AMQP Build Trigger** section:
 * Select **Enable** to allow the trigger to be active. No connection will be made until this is checked.
 * Enter the **Broker URI** in the format `amqp://ip-addr:port`, eg `amqp://localhost:5672` or `amqp://10.0.0.5:5672`
 * If necessary, enter a **Username** and **Password** for logging onto the broker. If supplied, the connection will use SASL `PLAIN` authentication, otherwise if left blank, `ANONYMOUS`. Make sure the broker is configured for this type of access and that the user is known to the broker.
@@ -38,15 +43,22 @@ For each project to be triggered, it is necessary to enable the trigger and set 
 The per-project configuration can be found at **Project Name** -> **Configure**
 
 Scroll down to the **Build Triggers** section.
-* Select **Qpid JMS Build Trigger**
+* Select **AMQP Build Trigger**
 * Enter a token which when matched on an incoming message will trigger the build. This is a string.
 
 **NOTE:** The same token may be used by several projects. When an incoming message matches the token, then all the projects using that token will be triggered together. The order of triggering is not guaranteed, however. If ordering is important, then sparate trigger tokens will be needed and each triggered using a separate message.
 
 **NOTE:** It is possible to perform a simple test of the trigger by using the maven command `mvn hpi:run` from the project top level directory. This will start a simplified version of Jenkins on a Jetty server instance, and the trigger plugin will be installed and running. Only Freestyle projects are available, but it makes for a quick and easy way of testing the trigger. The web interface will be available on `localhost:8080/jenkins`, and all jenkins logs, project files, etc. will be located in the project top-level directory under `work`.
 
-**NOTE:** It is possible to quickly send trigger messages using `qpid-send` as follows:
+**NOTE:** Individual Queue: It is possible to quickly send trigger messages using `qpid-send` as follows:
 ```
-qpid-send -a qjbt.trigger-queue -m1 -P msg_type="QJMS_build_trigger" -P jenkins_project_action="build" -P jenkins_project_token="<your test token>"
+qpid-send -a <queue-name> -m1
 ```
-where `<your test token>` is replaced by the token string set up in the per-project section above.
+where `<queue-name>` is replaced by the queue name configured for your project.
+
+**NOTE:** Global Queue: It is possible to quickly send trigger messages using `qpid-send` as follows:
+```
+qpid-send -a <global-queue-name> -m1 -P msg_type="AMQP_build_trigger" -P jenkins_project_action="build" -P jenkins_project_token="<your test token>"
+```
+where `<global-queue-name>` is replaced by the global queue name configured for the AMQP Trigger;
+      `<your test token>` is replaced by the token string set up in the per-project section above.
