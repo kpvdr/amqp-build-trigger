@@ -2,16 +2,12 @@ package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import hudson.Extension;
 import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.model.listeners.ItemListener;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
@@ -40,25 +36,6 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
     public RemoteBuildTrigger(String triggerQueues) {
         super();
         this.triggerQueues = StringUtils.stripToNull(triggerQueues);
-    }
-
-/*    @Override
-    public void start(T project, boolean newInstance) {
-        super.start(project, newInstance);
-    }
-*/
-/*    @Override
-    public void stop() {
-        super.stop();
-    }
-*/
-    public void removeDuplicatedTrigger(Set<RemoteBuildTrigger> triggers){
-        Map<String,RemoteBuildTrigger>  tempHashMap= new HashMap<String,RemoteBuildTrigger>();
-        for(RemoteBuildTrigger trigger:triggers){
-            tempHashMap.put(trigger.getProjectName(), trigger);
-        }
-        triggers.clear();
-        triggers.addAll(tempHashMap.values());
     }
 
     public String getTriggerQueues() {
@@ -138,7 +115,8 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
         return (DescriptorImpl) super.getDescriptor();
     }
 
-    @Extension @Symbol("atRemoteBuild")
+    @Extension
+    @Symbol("atRemoteBuild")
     public static class DescriptorImpl extends TriggerDescriptor {
 
         @Override
@@ -149,13 +127,6 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
         @Override
         public String getDisplayName() {
             return PLUGIN_NAME;
-        }
-
-        @Extension
-        public static class ItemListenerImpl extends ItemListener {
-
-            @Override
-            public void onLoaded() {}
         }
     }
 }

@@ -31,9 +31,9 @@ public class RemoteBuildListener implements MessageListener {
     @Override
     public void onMessage(Message message) {
         try {
-            LOGGER.info("onMessage() m=" + message.toString());
+            LOGGER.info("Message received on queue " + queueName + "; m=" + message.toString());
             for (RemoteBuildTrigger t : triggers) {
-                LOGGER.info("Remote build triggered: message received on queue " + queueName);
+                LOGGER.info("Remote build triggered: " + t.getProjectName());
                 t.scheduleBuild(queueName, null);
             }
         } catch (Exception e) {
