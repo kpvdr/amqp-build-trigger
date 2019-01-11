@@ -9,12 +9,12 @@ import hudson.model.listeners.ItemListener;
 public class ItemListenerImpl extends ItemListener {
     private static final Logger LOGGER = Logger.getLogger(ItemListenerImpl.class.getName());
     private final ConnectionManager manager;
-    
+
     public ItemListenerImpl() {
         super();
         this.manager = ConnectionManager.getInstance();
     }
-    
+
     @Override
     public final void onLoaded() {
         LOGGER.info("Starting AMQP Build Trigger");

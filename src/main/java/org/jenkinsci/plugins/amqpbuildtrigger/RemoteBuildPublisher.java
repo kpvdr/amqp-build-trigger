@@ -15,14 +15,14 @@ import hudson.tasks.Publisher;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class RemoteBuildPublisher extends Notifier {
-	
-	private String queueName;
-	
+
+    private String queueName;
+
     @DataBoundConstructor
     public RemoteBuildPublisher(String queueName) {
         this.queueName = queueName;
     }
-    
+
     public String getQueueName() {
         return queueName;
     }
@@ -30,18 +30,18 @@ public class RemoteBuildPublisher extends Notifier {
     public void setQueueName(String queueName) {
         this.queueName = queueName;
     }
-	
+
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
-	
+
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
-    	return true;
+        return true;
     }
-	
+
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
@@ -49,13 +49,13 @@ public class RemoteBuildPublisher extends Notifier {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-    	
-		@SuppressWarnings("rawtypes")
-		@Override
+
+        @SuppressWarnings("rawtypes")
+        @Override
         public boolean isApplicable(Class<? extends AbstractProject> project) {
             return true;
         }
-    	
+
         @Override
         public String getDisplayName() {
             return "Publish result using AMQP message";

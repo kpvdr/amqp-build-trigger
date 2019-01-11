@@ -7,45 +7,45 @@ import hudson.model.AperiodicWork;
 public class UpdateTimer extends AperiodicWork {
     private static final long DEFAULT_RECCURENCE_TIME = 60000; // ms, ie 60 sec
     private static final long INITIAL_DELAY_TIME = 15000; // ms, ie 15 sec
-    
+
     private volatile boolean stopRequested;
     private long reccurencePeriod;
-    
+
     public UpdateTimer() {
         this(DEFAULT_RECCURENCE_TIME, false);
     }
-    
+
     public UpdateTimer(long reccurencePeriod, boolean stopRequested) {
-    	this.reccurencePeriod = reccurencePeriod;
-    	this.stopRequested = stopRequested;
+        this.reccurencePeriod = reccurencePeriod;
+        this.stopRequested = stopRequested;
     }
-	
+
     @Override
-	public long getRecurrencePeriod() {
-		return reccurencePeriod;
-	}
-    
+    public long getRecurrencePeriod() {
+        return reccurencePeriod;
+    }
+
     @Override
     public long getInitialDelay() {
         return INITIAL_DELAY_TIME;
     }
 
-	@Override
-	public AperiodicWork getNewInstance() {
-		return new UpdateTimer(reccurencePeriod, stopRequested);
-	}
+    @Override
+    public AperiodicWork getNewInstance() {
+        return new UpdateTimer(reccurencePeriod, stopRequested);
+    }
 
-	@Override
-	protected void doAperiodicRun() {
+    @Override
+    protected void doAperiodicRun() {
         if (!stopRequested) {
-        	ConnectionManager.getInstance().update();
+            ConnectionManager.getInstance().update();
         }
-	}
+    }
 
     public void stop() {
         stopRequested = true;
     }
-    
+
     public void start() {
         stopRequested = false;
     }

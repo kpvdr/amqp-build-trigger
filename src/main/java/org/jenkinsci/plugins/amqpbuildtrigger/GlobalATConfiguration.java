@@ -92,7 +92,7 @@ public class GlobalATConfiguration extends GlobalConfiguration {
     public void setBrokerUri(final String brokerUri) {
         this.brokerUri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
     }
-    
+
     public String getUserName() {
         return userName;
     }
@@ -136,15 +136,15 @@ public class GlobalATConfiguration extends GlobalConfiguration {
         // TODO: (GitHub Issue #2) Validate URL
         if (uri != null /*&& urlValidator.isValid(uri)*/) {
             try {
-            	ConnectionFactory factory = (ConnectionFactory)new JmsConnectionFactory(uri);
-            	Connection connection = factory.createConnection(userName, userPassword.getPlainText());
-            	connection.setExceptionListener(new MyExceptionListener());
-            	connection.start();
-            	// TODO: Get connection properties
-            	connection.close();
+                ConnectionFactory factory = (ConnectionFactory)new JmsConnectionFactory(uri);
+                Connection connection = factory.createConnection(userName, userPassword.getPlainText());
+                connection.setExceptionListener(new MyExceptionListener());
+                connection.start();
+                // TODO: Get connection properties
+                connection.close();
                 return FormValidation.ok("ok");
             } catch (javax.jms.JMSException e) {
-            	return FormValidation.error(e.toString());
+                return FormValidation.error(e.toString());
             }
         }
         return FormValidation.error("Invalid Broker URL");

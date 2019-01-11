@@ -33,34 +33,34 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
     private static final String KEY_PARAM_NAME = "name";
     private static final String KEY_PARAM_VALUE = "value";
     private static final String PLUGIN_NAME = "AMQP Build Trigger";
-    
+
     private String triggerQueues;
-    
+
     @DataBoundConstructor
     public RemoteBuildTrigger(String triggerQueues) {
         super();
         this.triggerQueues = StringUtils.stripToNull(triggerQueues);
     }
-    
+
 /*    @Override
     public void start(T project, boolean newInstance) {
-    	super.start(project, newInstance);
+        super.start(project, newInstance);
     }
 */
 /*    @Override
     public void stop() {
-    	super.stop();
+        super.stop();
     }
-*/    
+*/
     public void removeDuplicatedTrigger(Set<RemoteBuildTrigger> triggers){
-        Map<String,RemoteBuildTrigger>  tempHashMap= new HashMap<String,RemoteBuildTrigger>(); 
+        Map<String,RemoteBuildTrigger>  tempHashMap= new HashMap<String,RemoteBuildTrigger>();
         for(RemoteBuildTrigger trigger:triggers){
             tempHashMap.put(trigger.getProjectName(), trigger);
-        }    
+        }
         triggers.clear();
         triggers.addAll(tempHashMap.values());
     }
-    
+
     public String getTriggerQueues() {
         return triggerQueues;
     }
@@ -68,28 +68,28 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
     public void setTriggerQueues(String remoteBuildToken) {
         this.triggerQueues = remoteBuildToken;
     }
-    
+
     public List<String> getTriggerQueueList() {
-    	return Arrays.asList(triggerQueues.split("\\s*,\\s*"));
+        return Arrays.asList(triggerQueues.split("\\s*,\\s*"));
     }
-    
+
     public void setTriggerQueueList(List<String> triggerQueueList) {
-    	triggerQueues = "";
-    	for (String triggerQueueItem: triggerQueueList) {
-    		if (!triggerQueues.isEmpty()) {
-    			triggerQueues += ", ";
-    		}
-    		triggerQueues += triggerQueueItem;
-    	}
+        triggerQueues = "";
+        for (String triggerQueueItem: triggerQueueList) {
+            if (!triggerQueues.isEmpty()) {
+                triggerQueues += ", ";
+            }
+            triggerQueues += triggerQueueItem;
+        }
     }
-    
+
     public String getProjectName() {
         if(job != null){
             return job.getFullName();
         }
         return "";
     }
-    
+
     public void scheduleBuild(String queueName, JSONArray jsonArray) {
         if (job != null) {
           if (jsonArray != null) {
@@ -100,7 +100,7 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
           }
         }
     }
-    
+
     private List<ParameterValue> getUpdatedParameters(JSONArray jsonParameters, List<ParameterValue> definedParameters) {
         List<ParameterValue> newParams = new ArrayList<ParameterValue>();
         for (ParameterValue defParam : definedParameters) {
@@ -115,7 +115,7 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
         }
         return newParams;
     }
-    
+
     private List<ParameterValue> getDefinitionParameters(Job<?, ?> project) {
         List<ParameterValue> parameters = new ArrayList<ParameterValue>();
         ParametersDefinitionProperty properties = project
@@ -132,12 +132,12 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
 
         return parameters;
     }
-    
+
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
     }
-    
+
     @Extension @Symbol("atRemoteBuild")
     public static class DescriptorImpl extends TriggerDescriptor {
 
