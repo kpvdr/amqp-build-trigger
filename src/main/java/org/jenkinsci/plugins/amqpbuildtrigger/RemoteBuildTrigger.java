@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +16,10 @@ import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.ParameterValue;
-import hudson.model.Project;
 import hudson.model.StringParameterValue;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 
-import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 
 import net.sf.json.JSONArray;
@@ -31,39 +30,28 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.ParameterizedJob> extends Trigger<T> {
-    public static final String PLUGIN_APPID = "remote-build";
-    
     private static final String KEY_PARAM_NAME = "name";
     private static final String KEY_PARAM_VALUE = "value";
     private static final String PLUGIN_NAME = "AMQP Build Trigger";
     
-    private String remoteBuildToken;
+    private String triggerQueues;
     
     @DataBoundConstructor
-    public RemoteBuildTrigger(String remoteBuildToken) {
+    public RemoteBuildTrigger(String triggerQueues) {
         super();
-        this.remoteBuildToken = StringUtils.stripToNull(remoteBuildToken);
+        this.triggerQueues = StringUtils.stripToNull(triggerQueues);
     }
     
-    @Override
+/*    @Override
     public void start(T project, boolean newInstance) {
-        RemoteBuildListener listener = RemoteBuildListener.all().get(RemoteBuildListener.class);
-        if (listener != null) {
-            listener.addTrigger(this);
-            removeDuplicatedTrigger(listener.getTriggers());
-        }
     	super.start(project, newInstance);
     }
-
-    @Override
+*/
+/*    @Override
     public void stop() {
-        RemoteBuildListener listener = RemoteBuildListener.all().get(RemoteBuildListener.class);
-        if (listener != null) {
-            listener.removeTrigger(this);
-        }
     	super.stop();
     }
-    
+*/    
     public void removeDuplicatedTrigger(Set<RemoteBuildTrigger> triggers){
         Map<String,RemoteBuildTrigger>  tempHashMap= new HashMap<String,RemoteBuildTrigger>(); 
         for(RemoteBuildTrigger trigger:triggers){
@@ -73,12 +61,26 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
         triggers.addAll(tempHashMap.values());
     }
     
-    public String getRemoteBuildToken() {
-        return remoteBuildToken;
+    public String getTriggerQueues() {
+        return triggerQueues;
     }
 
-    public void setRemoteBuildToken(String remoteBuildToken) {
-        this.remoteBuildToken = remoteBuildToken;
+    public void setTriggerQueues(String remoteBuildToken) {
+        this.triggerQueues = remoteBuildToken;
+    }
+    
+    public List<String> getTriggerQueueList() {
+    	return Arrays.asList(triggerQueues.split("\\s*,\\s*"));
+    }
+    
+    public void setTriggerQueueList(List<String> triggerQueueList) {
+    	triggerQueues = "";
+    	for (String triggerQueueItem: triggerQueueList) {
+    		if (!triggerQueues.isEmpty()) {
+    			triggerQueues += ", ";
+    		}
+    		triggerQueues += triggerQueueItem;
+    	}
     }
     
     public String getProjectName() {
@@ -153,18 +155,7 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
         public static class ItemListenerImpl extends ItemListener {
 
             @Override
-            public void onLoaded() {
-                RemoteBuildListener listener = RemoteBuildListener.all().get(RemoteBuildListener.class);
-                Jenkins jenkins = Jenkins.getInstance();
-                if (jenkins != null) {
-                    for (Project<?, ?> p : jenkins.getAllItems(Project.class)) {
-                        RemoteBuildTrigger t = p.getTrigger(RemoteBuildTrigger.class);
-                        if (t != null) {
-                            listener.addTrigger(t);
-                        }
-                    }
-                }
-            }
+            public void onLoaded() {}
         }
     }
 }

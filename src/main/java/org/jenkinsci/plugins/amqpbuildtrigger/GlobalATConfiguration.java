@@ -32,8 +32,8 @@ public class GlobalATConfiguration extends GlobalConfiguration {
     //private static final Logger LOGGER = Logger.getLogger(GlobalQpidJmsConfiguration.class.getName());
     //private static final String[] AMQP_SCHEMES = { "amqp", "amqps" };
     //private final UrlValidator urlValidator = new UrlValidator(AMQP_SCHEMES, UrlValidator.ALLOW_LOCAL_URLS);
-    
-	private boolean enabledFlag;
+
+    private boolean enabledFlag;
     private String brokerUri;
     private String userName;
     private Secret userPassword;
@@ -41,14 +41,14 @@ public class GlobalATConfiguration extends GlobalConfiguration {
 
     @DataBoundConstructor
     public GlobalATConfiguration(boolean enableFlag, String brokerUri, String userName, Secret userPassword,
-    		boolean enableDebug) {
+                                 boolean enableDebug) {
         this.enabledFlag = enableFlag;
         this.brokerUri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
         this.userName = userName;
-        this.userPassword = userPassword;    	
+        this.userPassword = userPassword;
         this.enableDebug = enableDebug;
     }
-    
+
     public GlobalATConfiguration() {
         load();
     }
@@ -61,14 +61,14 @@ public class GlobalATConfiguration extends GlobalConfiguration {
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws hudson.model.Descriptor.FormException {
         req.bindJSON(this, json);
-        // TODO: (#2) Find an AMQP URL validator.
-    	if (true) { // if (urlValidator.isValid(serviceUri)) {
-    		save();
-    		return true;
-    	}
-    	return false;
+        // TODO: (GitHub Issue #2) Find an AMQP URL validator.
+        if (true) { // if (urlValidator.isValid(serviceUri)) {
+            save();
+            return true;
+        }
+        return false;
     }
-    
+
     public boolean isEnableDebug() {
         return enableDebug;
     }
@@ -76,19 +76,19 @@ public class GlobalATConfiguration extends GlobalConfiguration {
     public void setEnableDebug(boolean enableDebug) {
         this.enableDebug = enableDebug;
     }
-    
+
     public boolean isEnabledFlag() {
         return enabledFlag;
     }
-    
+
     public void setEnabledFlag(boolean enableFlag) {
         this.enabledFlag = enableFlag;
     }
-    
+
     public String getBrokerUri() {
         return brokerUri;
     }
-    
+
     public void setBrokerUri(final String brokerUri) {
         this.brokerUri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
     }
@@ -96,30 +96,30 @@ public class GlobalATConfiguration extends GlobalConfiguration {
     public String getUserName() {
         return userName;
     }
-    
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
-    
+
     public Secret getUserPassword() {
         return userPassword;
     }
-    
+
     public void setUserPassword(Secret userPassword) {
         this.userPassword = userPassword;
     }
-    
+
     public void setUserPassword(String userPassword) {
         this.userPassword = Secret.fromString(userPassword);
     }
-    
+
     public FormValidation doCheckBrokerUri(@QueryParameter String value) {
         String val = StringUtils.stripToNull(value);
         if (val == null) {
             return FormValidation.ok();
         }
 
-        // TODO: (#2) Validate URL
+        // TODO: (GitHub Issue #2) Validate URL
         //if (urlValidator.isValid(val)) {
         //    return FormValidation.ok();
         //} else {
@@ -127,12 +127,13 @@ public class GlobalATConfiguration extends GlobalConfiguration {
         //}
         return FormValidation.ok();
     }
-    
+
     public FormValidation doTestConnection(@QueryParameter("brokerUri") String brokerUri,
             @QueryParameter("userName") String userName,
-            @QueryParameter("userPassword") Secret userPassword) throws ServletException {
+            @QueryParameter("userPassword") Secret userPassword,
+            @QueryParameter("globalQueueName") String globalQueueName) throws ServletException {
         String uri = StringUtils.strip(StringUtils.stripToNull(brokerUri), "/");
-        // TODO: (#2) Validate URL
+        // TODO: (GitHub Issue #2) Validate URL
         if (uri != null /*&& urlValidator.isValid(uri)*/) {
             try {
             	ConnectionFactory factory = (ConnectionFactory)new JmsConnectionFactory(uri);
@@ -148,7 +149,7 @@ public class GlobalATConfiguration extends GlobalConfiguration {
         }
         return FormValidation.error("Invalid Broker URL");
     }
-    
+
     public static GlobalATConfiguration get() {
         return GlobalConfiguration.all().get(GlobalATConfiguration.class);
     }
@@ -162,4 +163,3 @@ public class GlobalATConfiguration extends GlobalConfiguration {
         }
     }
 }
-

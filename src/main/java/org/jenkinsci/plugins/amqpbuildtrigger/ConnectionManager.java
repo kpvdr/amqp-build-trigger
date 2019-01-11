@@ -1,8 +1,11 @@
 package org.jenkinsci.plugins.amqpbuildtrigger;
 
 import java.net.URI;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Logger;
+import java.util.List;
+import java.util.Map;
 
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
@@ -11,7 +14,10 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 
+import hudson.model.Project;
 import hudson.util.Secret;
+
+import jenkins.model.Jenkins;
 
 import org.apache.qpid.jms.JmsConnection;
 import org.apache.qpid.jms.JmsConnectionFactory;
@@ -20,12 +26,9 @@ import org.apache.qpid.jms.message.JmsInboundMessageDispatch;
 
 public class ConnectionManager implements JmsConnectionListener {
     private static final Logger LOGGER = Logger.getLogger(ConnectionManager.class.getName());
-    private static final String QUEUE_NAME = "qjbt.trigger-queue";
 
 	private JmsConnection connection = null;
 	private Session session = null;
-	private Queue queue = null;
-	private MessageConsumer messageConsumer = null;
 	
     private static class InstanceHolder {
         private static final ConnectionManager INSTANCE = new ConnectionManager();
@@ -38,14 +41,10 @@ public class ConnectionManager implements JmsConnectionListener {
 	private ConnectionManager() {}
 	
 	@Override
-	public void onConnectionEstablished(URI remoteURI) {
-		LOGGER.info(remoteURI + ": Connection established");
-	}
+	public void onConnectionEstablished(URI remoteURI) {}
 
 	@Override
-	public void onConnectionFailure(Throwable error) {
-		LOGGER.info("Connection failed: " + error.getMessage());
-	}
+	public void onConnectionFailure(Throwable error) {}
 
 	@Override
 	public void onConnectionInterrupted(URI remoteURI) {
@@ -59,22 +58,22 @@ public class ConnectionManager implements JmsConnectionListener {
 
 	@Override
 	public void onInboundMessage(JmsInboundMessageDispatch envelope) {
-		LOGGER.info("onInboundMessage");
+		LOGGER.info("JMS message received: " + envelope.getMessage());
 	}
 
 	@Override
 	public void onSessionClosed(Session session, Throwable cause) {
-		LOGGER.info("onSessionClosed");
+		LOGGER.info("Session " + session.toString() + " closed: " + cause.getMessage());
 	}
 
 	@Override
 	public void onConsumerClosed(MessageConsumer consumer, Throwable cause) {
-		LOGGER.info("onConsumerClosed");
+		LOGGER.info("Consumer " + consumer.toString() + " closed: " + cause.getMessage());
 	}
 
 	@Override
 	public void onProducerClosed(MessageProducer producer, Throwable cause) {
-		LOGGER.info("onProducerClosed");
+		LOGGER.info("Producer " + producer.toString() + " closed: " + cause.getMessage());
 	}
 
 	public boolean isConnected() {
@@ -121,24 +120,72 @@ public class ConnectionManager implements JmsConnectionListener {
 	            	connection.setExceptionListener(new MyExceptionListener());
 	            	connection.addConnectionListener(ConnectionManager.getInstance());
 	            	session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-	            	queue = session.createQueue(QUEUE_NAME);
-	            	messageConsumer = session.createConsumer(queue);
-	            	messageConsumer.setMessageListener(new RemoteBuildListener(QUEUE_NAME));
+	            	
+	            	// Keep a map of queues to list of triggers, as a queue may be used by multiple
+	            	// triggers.
+	            	Map<String, List<RemoteBuildTrigger> > queueNameMap = new HashMap<String, List<RemoteBuildTrigger> >();
+	                Jenkins jenkins = Jenkins.getInstance();
+	                if (jenkins != null) {
+	                	for (Project<?, ?> p : jenkins.getAllItems(Project.class)) {
+	                		RemoteBuildTrigger t = p.getTrigger(RemoteBuildTrigger.class);
+	                		if (t != null) {
+	                			List<String> queueNameList = t.getTriggerQueueList();
+	                			for (String queueName: queueNameList) {
+	                				if (queueNameMap.containsKey(queueName)) {
+	                					queueNameMap.get(queueName).add(t);
+	                				} else {
+	                					List<RemoteBuildTrigger> l = new ArrayList<RemoteBuildTrigger>();
+	                					l.add(t);
+	                					queueNameMap.put(queueName, l);
+	                				}
+	                			}
+	                		}
+	                	}
+	                }
+	                
+	                // Cycle through all queues in map, create a listener for each
+	                for (String queueName: queueNameMap.keySet()) {
+	                	createListener(session, queueName, queueNameMap.get(queueName));
+	                }
+	            	
 	            	connection.start();
             	} catch (JMSException e) {
             		shutdown();
-            		LOGGER.log(Level.WARNING, "Cannot open connection.", e.getMessage());
+            		LOGGER.warning("Cannot open connection: " + e.getMessage());
             	}
             }
         }
 	}
 	
+	public void createListener(Session session, String queueName, List<RemoteBuildTrigger> triggerList) throws JMSException {
+		if (session != null) {
+			Queue queue = session.createQueue(queueName);
+			MessageConsumer messageConsumer = session.createConsumer(queue);
+			RemoteBuildListener listener = new RemoteBuildListener(queueName);
+			for (RemoteBuildTrigger t: triggerList) {
+				listener.addTrigger(t);
+			}
+			messageConsumer.setMessageListener(listener);
+			LOGGER.info("Created listener for queue \"" + queueName + "\" containing " + triggerList.size() +
+					(triggerList.size() == 1 ? " trigger" : " triggers"));
+		}
+	}
+	
     public void shutdown() {
+    	if (session != null) {
+    		try {
+    			session.close();
+    		} catch (JMSException e) {
+    			LOGGER.warning("Cannot close session. " + e.getMessage());
+    		} finally {
+    			session = null;
+    		}
+    	}
         if (connection != null) {
             try {
             	connection.close();
             } catch (JMSException e) {
-            	LOGGER.log(Level.WARNING, "Cannot close connection.", e.getMessage());
+            	LOGGER.warning("Cannot close connection." + e.getMessage());
             } finally {
             	connection = null;
             }

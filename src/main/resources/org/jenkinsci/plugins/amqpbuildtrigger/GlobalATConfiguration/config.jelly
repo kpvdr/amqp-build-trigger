@@ -33,10 +33,5 @@
       <f:password />
     </f:entry>
     <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testConnection" with="brokerUri,userName,userPassword" />
-    <f:advanced>
-      <f:entry title="${%Enable debug}" field="enableDebug">
-        <f:checkbox />
-      </f:entry>
-    </f:advanced>
   </f:section>
 </j:jelly>

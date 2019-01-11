@@ -5,8 +5,8 @@ import hudson.model.AperiodicWork;
 
 @Extension
 public class UpdateTimer extends AperiodicWork {
-    private static final long DEFAULT_RECCURENCE_TIME = 20000; // ms
-    private static final long INITIAL_DELAY_TIME = 15000; // ms
+    private static final long DEFAULT_RECCURENCE_TIME = 60000; // ms, ie 60 sec
+    private static final long INITIAL_DELAY_TIME = 15000; // ms, ie 15 sec
     
     private volatile boolean stopRequested;
     private long reccurencePeriod;

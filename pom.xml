@@ -42,7 +42,7 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-    <name>Qpid JMS Build Trigger Plugin</name>
+    <name>AMQP Build Trigger Plugin</name>
     <dependencies>
     	<dependency>
     		<groupId>org.apache.commons</groupId>
