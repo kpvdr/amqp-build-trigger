@@ -17,12 +17,12 @@ public class JenkinsEventListener extends ItemListener {
         // TODO: Start ConnectionUpdateTimer
         super.onLoaded();
     }
-    
+
     @Override
     public final void onUpdated(Item item) {
-    	LOGGER.info("Job updated: " + item.getFullName());
-    	ConnectionManager.getInstance().initialize();
-    	super.onUpdated(item);
+        LOGGER.info("Job updated: " + item.getFullName());
+        ConnectionManager.getInstance().initialize();
+        super.onUpdated(item);
     }
 
     @Override

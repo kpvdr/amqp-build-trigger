@@ -11,7 +11,7 @@ public class ConnectionUpdateTimer extends AperiodicWork {
 
     private volatile boolean stopRequested;
     private long reccurencePeriod;
-    
+
     public ConnectionUpdateTimer() {
         this(DEFAULT_RECCURENCE_TIME, false);
     }
@@ -21,27 +21,27 @@ public class ConnectionUpdateTimer extends AperiodicWork {
         this.stopRequested = stopRequested;
     }
 
-	@Override
-	public long getRecurrencePeriod() {
-		return reccurencePeriod;
-	}
+    @Override
+    public long getRecurrencePeriod() {
+        return reccurencePeriod;
+    }
 
     @Override
     public long getInitialDelay() {
         return INITIAL_DELAY_TIME;
     }
 
-	@Override
-	public AperiodicWork getNewInstance() {
-		return new ConnectionUpdateTimer(reccurencePeriod, stopRequested);
-	}
+    @Override
+    public AperiodicWork getNewInstance() {
+        return new ConnectionUpdateTimer(reccurencePeriod, stopRequested);
+    }
 
-	@Override
-	protected void doAperiodicRun() {
-		if (!stopRequested) {
-			ConnectionManager.getInstance().update();
-		}
-	}
+    @Override
+    protected void doAperiodicRun() {
+        if (!stopRequested) {
+            ConnectionManager.getInstance().update();
+        }
+    }
 
     public void stop() {
         stopRequested = true;

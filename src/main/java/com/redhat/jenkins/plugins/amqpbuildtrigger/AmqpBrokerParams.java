@@ -23,70 +23,70 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
-	private static final String DISPLAY_NAME = "AMQP Broker Parameters";
-	
+    private static final String DISPLAY_NAME = "AMQP Broker Parameters";
+
     private String brokerUrl;
     private String username;
     private Secret password;
     private String queueName;
-    
+
     @DataBoundConstructor
     public AmqpBrokerParams(String brokerUrl, String username, Secret password, String queueName) {
-    	this.brokerUrl = brokerUrl;
-    	this.username = username;
-    	this.password = password;
-    	this.queueName = queueName;
-    	System.out.println("***** AmqpBroker created: " + toString());
+        this.brokerUrl = brokerUrl;
+        this.username = username;
+        this.password = password;
+        this.queueName = queueName;
+        System.out.println("***** AmqpBroker created: " + toString());
     }
-    
+
     public String getBrokerUrl() {
-    	return brokerUrl;
+        return brokerUrl;
     }
-    
+
     public String getUsername() {
-    	return username;
+        return username;
     }
-    
+
     public Secret getPassword() {
-    	return password;
+        return password;
     }
-    
+
     public String getQueueName() {
-    	return queueName;
+        return queueName;
     }
-    
+
     @DataBoundSetter
     public void setBrokerUrl(String brokerUrl) {
-    	this.brokerUrl = brokerUrl;
+        this.brokerUrl = brokerUrl;
     }
-    
+
     @DataBoundSetter
     public void setUsername(String username) {
-    	this.username = username;
+        this.username = username;
     }
-    
+
     @DataBoundSetter
     public void setPassword(Secret password) {
-    	this.password = password;
+        this.password = password;
     }
 
     public void setUserPassword(String password) {
         this.password = Secret.fromString(password);
     }
-    
+
     @DataBoundSetter
     public void setQueueName(String queueName) {
-    	this.queueName = queueName;
+        this.queueName = queueName;
     }
-    
+
     public String toString() {
-    	return brokerUrl + "/" + queueName;
+        return brokerUrl + "/" + queueName;
     }
-    
+
     public boolean isValid() {
-    	return brokerUrl != null && !brokerUrl.isEmpty() && queueName != null && !queueName.isEmpty();
+        return brokerUrl != null && !brokerUrl.isEmpty() && queueName != null && !queueName.isEmpty();
     }
-    
+
     @Override
     public Descriptor<AmqpBrokerParams> getDescriptor() {
         return Jenkins.getInstance().getDescriptorByType(AmqpBrokerUrlDescriptor.class);
@@ -99,11 +99,11 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
         public String getDisplayName() {
             return DISPLAY_NAME;
         }
-    	
+
         public static ExtensionList<AmqpBrokerUrlDescriptor> all() {
             return Jenkins.getInstance().getExtensionList(AmqpBrokerUrlDescriptor.class);
         }
-        
+
         public FormValidation doTestConnection(@QueryParameter("brokerUrl") String brokerUrl) throws ServletException {
             String uri = StringUtils.strip(StringUtils.stripToNull(brokerUrl), "/");
             // TODO: (GitHub Issue #2) Validate URL

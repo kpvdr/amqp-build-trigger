@@ -28,27 +28,27 @@ public class AmqpBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Parame
     private static final String KEY_PARAM_NAME = "name";
     private static final String KEY_PARAM_VALUE = "value";
     private static final String PLUGIN_NAME = "AMQP Build Trigger";
-	private List<AmqpBrokerParams> amqpBrokerParamsList = new ArrayList<AmqpBrokerParams>();
-	
-	@DataBoundConstructor
-	public AmqpBuildTrigger(List<AmqpBrokerParams> amqpBrokerParamsList) {
-		super();
-		this.amqpBrokerParamsList = amqpBrokerParamsList;
-	}
+    private List<AmqpBrokerParams> amqpBrokerParamsList = new ArrayList<AmqpBrokerParams>();
 
-	public List<AmqpBrokerParams> getAmqpBrokerParamsList() {
-		return amqpBrokerParamsList;
-	}
-	
-	@DataBoundSetter
-	public void setAmqpBrokerParamsList(List<AmqpBrokerParams> amqpBrokerParamsList) {
-		this.amqpBrokerParamsList = amqpBrokerParamsList;
-	}
+    @DataBoundConstructor
+    public AmqpBuildTrigger(List<AmqpBrokerParams> amqpBrokerParamsList) {
+        super();
+        this.amqpBrokerParamsList = amqpBrokerParamsList;
+    }
 
-	@Override
-	public String toString() {
-		return getProjectName();
-	}
+    public List<AmqpBrokerParams> getAmqpBrokerParamsList() {
+        return amqpBrokerParamsList;
+    }
+
+    @DataBoundSetter
+    public void setAmqpBrokerParamsList(List<AmqpBrokerParams> amqpBrokerParamsList) {
+        this.amqpBrokerParamsList = amqpBrokerParamsList;
+    }
+
+    @Override
+    public String toString() {
+        return getProjectName();
+    }
 
     public String getProjectName() {
         if(job != null){
@@ -95,22 +95,22 @@ public class AmqpBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Parame
         return parameters;
     }
 
-	@Override
-	public AmqpBuildTriggerDescriptor getDescriptor() {
-	    return (AmqpBuildTriggerDescriptor) Jenkins.getInstance().getDescriptor(getClass());
-	}
+    @Override
+    public AmqpBuildTriggerDescriptor getDescriptor() {
+        return (AmqpBuildTriggerDescriptor) Jenkins.getInstance().getDescriptor(getClass());
+    }
 
     @Extension
-	public static class AmqpBuildTriggerDescriptor extends TriggerDescriptor {
+    public static class AmqpBuildTriggerDescriptor extends TriggerDescriptor {
 
-		@Override
-		public boolean isApplicable(Item item) {
-			return true;
-		}
+        @Override
+        public boolean isApplicable(Item item) {
+            return true;
+        }
 
-		@Override
-		public String getDisplayName() {
-			return PLUGIN_NAME;
-		}    	
+        @Override
+        public String getDisplayName() {
+            return PLUGIN_NAME;
+        }
     }
 }

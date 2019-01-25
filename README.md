@@ -13,7 +13,19 @@ then select the **Advanced** tab. Under the **Upload Plugin** section, select th
 After a restart, the plugin should be active in Jenkins.
 
 ## Basic Configuration
-Within each job, scroll down to the **AMQP Build Trigger** section. Each job may specify multiple brokers and/or queues on which to listen for trigger messages. Initially, the list will be empty. Select the **AMQP Build Trigger** checkbox to enable the trigger. Click the **Add** button to add a broker/queue, then select **AMQP Broker URL** from the drop-down list. This will create a new empty broker block. To complete the broker block:
+Within each job, scroll down to the **AMQP Build Trigger** section.
+
+![AMQP Build Trigger location](images/image_A.png)
+
+Each job may specify multiple brokers and/or queues on which to listen for trigger messages. Initially, the list will be empty. Select the **AMQP Build Trigger** checkbox to enable the trigger. Click the **Add** button to add a broker/queue, then select **AMQP Broker URL** from the drop-down list.
+
+![Adding a new broker](images/image_B.png)
+
+This will create a new empty broker block.
+
+![Broker properties block](images/image_C.png)
+
+To complete the broker block:
 
 * Enter the **Broker URL** in the format `amqp://ip-addr:port`, eg `amqp://localhost:5672` or `amqp://10.0.0.5:5672`
 * If necessary, enter a **Username** and **Password** for logging onto the broker. If supplied, the connection will use SASL `PLAIN` authentication, otherwise if left blank, `ANONYMOUS`. Make sure the broker is configured for this type of access and that the user is known to the broker.
