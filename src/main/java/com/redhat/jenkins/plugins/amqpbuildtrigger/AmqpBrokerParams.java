@@ -23,6 +23,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
+	private static final String DISPLAY_NAME = "AMQP Broker Parameters";
 	
     private String brokerUrl;
     private String username;
@@ -96,7 +97,7 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
 
         @Override
         public String getDisplayName() {
-            return "AMQP Broker URL";
+            return DISPLAY_NAME;
         }
     	
         public static ExtensionList<AmqpBrokerUrlDescriptor> all() {

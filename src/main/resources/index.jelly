@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    This plugin connects to an AMQP broker, receive messages from a queue, then triggers builds based on the message content.
+    This plugin allows jobs to connect to one or more AMQP brokers, receive messages from them, and trigger a build when the message is received.
 </div>
