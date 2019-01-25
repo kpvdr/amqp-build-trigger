@@ -1,46 +1,47 @@
-package org.jenkinsci.plugins.amqpbuildtrigger;
+package com.redhat.jenkins.plugins.amqpbuildtrigger;
 
 import hudson.Extension;
 import hudson.model.AperiodicWork;
 
 @Extension
-public class UpdateTimer extends AperiodicWork {
+public class ConnectionUpdateTimer extends AperiodicWork {
+
     private static final long DEFAULT_RECCURENCE_TIME = 60000; // ms, ie 60 sec
     private static final long INITIAL_DELAY_TIME = 15000; // ms, ie 15 sec
 
     private volatile boolean stopRequested;
     private long reccurencePeriod;
-
-    public UpdateTimer() {
+    
+    public ConnectionUpdateTimer() {
         this(DEFAULT_RECCURENCE_TIME, false);
     }
 
-    public UpdateTimer(long reccurencePeriod, boolean stopRequested) {
+    public ConnectionUpdateTimer(long reccurencePeriod, boolean stopRequested) {
         this.reccurencePeriod = reccurencePeriod;
         this.stopRequested = stopRequested;
     }
 
-    @Override
-    public long getRecurrencePeriod() {
-        return reccurencePeriod;
-    }
+	@Override
+	public long getRecurrencePeriod() {
+		return reccurencePeriod;
+	}
 
     @Override
     public long getInitialDelay() {
         return INITIAL_DELAY_TIME;
     }
 
-    @Override
-    public AperiodicWork getNewInstance() {
-        return new UpdateTimer(reccurencePeriod, stopRequested);
-    }
+	@Override
+	public AperiodicWork getNewInstance() {
+		return new ConnectionUpdateTimer(reccurencePeriod, stopRequested);
+	}
 
-    @Override
-    protected void doAperiodicRun() {
-        if (!stopRequested) {
-            ConnectionManager.getInstance().update();
-        }
-    }
+	@Override
+	protected void doAperiodicRun() {
+		if (!stopRequested) {
+			ConnectionManager.getInstance().update();
+		}
+	}
 
     public void stop() {
         stopRequested = true;
