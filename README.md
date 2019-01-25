@@ -15,15 +15,15 @@ After a restart, the plugin should be active in Jenkins.
 ## Basic Configuration
 Within each job, scroll down to the **AMQP Build Trigger** section.
 
-![AMQP Build Trigger location](images/image_A.png)
+![AMQP Build Trigger location](images/image_A.png | width=1000)
 
-Each job may specify multiple brokers and/or queues on which to listen for trigger messages. Initially, the list will be empty. Select the **AMQP Build Trigger** checkbox to enable the trigger. Click the **Add** button to add a broker/queue, then select **AMQP Broker URL** from the drop-down list.
+Each job may specify multiple brokers and/or queues on which to listen for trigger messages. Initially, the list will be empty. Select the **AMQP Build Trigger** checkbox to enable the trigger. Click the **Add** button to add a broker/queue, then select **AMQP Broker Parameters** from the drop-down list.
 
-![Adding a new broker](images/image_B.png)
+![Adding a new broker](images/image_B.png | width=786)
 
 This will create a new empty broker block.
 
-![Broker properties block](images/image_C.png)
+![Broker properties block](images/image_C.png | width=786)
 
 To complete the broker block:
 
