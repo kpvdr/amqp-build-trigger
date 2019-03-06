@@ -59,5 +59,16 @@
     		<artifactId>qpid-jms-client</artifactId>
     		<version>0.37.0</version>
     	</dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>2.31</version>
+        </dependency>
+        <!-- This is to fix the enforcing RequireUpperBoundDeps mess when using workflow-job -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>structs</artifactId>
+            <version>1.17</version>
+        </dependency>
     </dependencies>
 </project>

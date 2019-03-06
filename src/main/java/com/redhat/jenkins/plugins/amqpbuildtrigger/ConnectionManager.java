@@ -1,6 +1,8 @@
 package com.redhat.jenkins.plugins.amqpbuildtrigger;
 
 import hudson.model.Project;
+import hudson.triggers.Trigger;
+import hudson.triggers.TriggerDescriptor;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -16,6 +18,8 @@ import jenkins.model.Jenkins;
 
 import org.apache.qpid.jms.JmsConnectionListener;
 import org.apache.qpid.jms.message.JmsInboundMessageDispatch;
+
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 public class ConnectionManager implements JmsConnectionListener {
 
@@ -41,13 +45,13 @@ public class ConnectionManager implements JmsConnectionListener {
                 if (connectionMap.containsKey(url.toString())) {
                     // Add trigger to existing connection
                     if (!connectionMap.get(url.toString()).addBuildTrigger(trigger)) {
-                        LOGGER.warning("ConnectionManager.addBuildTrigger(): failed to add trigger " + trigger.getProjectName());
+                        LOGGER.warning("ConnectionManager.addBuildTrigger(): failed to add trigger " + trigger.getProjectName() + " to existing connection");
                     }
                 } else {
                     // Create new connection
                     AmqpConnection c = new AmqpConnection(url);
                     if (!c.addBuildTrigger(trigger)) {
-                        LOGGER.warning("ConnectionManager.addBuildTrigger() B: failed to add trigger " + trigger.getProjectName());
+                        LOGGER.warning("ConnectionManager.addBuildTrigger(): failed to add trigger " + trigger.getProjectName() + " to new connection");
                     }
                     connectionMap.put(url.toString(), c);
                 }
@@ -61,10 +65,23 @@ public class ConnectionManager implements JmsConnectionListener {
 
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins != null) {
+            // Find triggers for freestyle jobs
             for (Project<?, ?> p : jenkins.getAllItems(Project.class)) {
                 AmqpBuildTrigger t = p.getTrigger(AmqpBuildTrigger.class);
                 if (t != null) {
                     addBuildTrigger(t);
+                }
+            }
+           // Find triggers for Pipelines/workflow jobs
+            for (WorkflowJob j : jenkins.getAllItems(WorkflowJob.class)) {
+                Map<TriggerDescriptor, Trigger<?>> m = j.getTriggers();
+                for (TriggerDescriptor d: m.keySet()) {
+                    if (d instanceof AmqpBuildTrigger.AmqpBuildTriggerDescriptor) {
+                        AmqpBuildTrigger t = (AmqpBuildTrigger) m.get(d);
+                        if (t != null) {
+                            addBuildTrigger(t);
+                        }
+                    }
                 }
             }
         }
