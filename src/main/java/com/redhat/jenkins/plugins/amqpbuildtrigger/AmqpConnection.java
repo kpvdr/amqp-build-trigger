@@ -38,8 +38,8 @@ public class AmqpConnection {
             return;
         }
         if (connection != null &&
-                !brokerParams.getBrokerUrl().equals(connection.getConnectedURI().toString().split("\\?")[0]) &&
-                !brokerParams.getUsername().equals(connection.getUsername()) &&
+                !brokerParams.getUrl().equals(connection.getConnectedURI().toString().split("\\?")[0]) &&
+                !brokerParams.getUser().equals(connection.getUsername()) &&
                 !brokerParams.getPassword().getPlainText().equals(connection.getPassword())) {
             if (connection != null) {
                 shutdown();
@@ -55,17 +55,17 @@ public class AmqpConnection {
 
     public boolean open(AmqpMessageListener listener) {
         try {
-            JmsConnectionFactory factory = new JmsConnectionFactory(brokerParams.getBrokerUrl());
-            if (brokerParams.getUsername().isEmpty() || brokerParams.getPassword().getPlainText().isEmpty()) {
+            JmsConnectionFactory factory = new JmsConnectionFactory(brokerParams.getUrl());
+            if (brokerParams.getUser().isEmpty() || brokerParams.getPassword().getPlainText().isEmpty()) {
                 connection = (JmsConnection)factory.createConnection();
             } else {
-                connection = (JmsConnection)factory.createConnection(brokerParams.getUsername(), brokerParams.getPassword().getPlainText());
+                connection = (JmsConnection)factory.createConnection(brokerParams.getUser(), brokerParams.getPassword().getPlainText());
             }
             connection.setExceptionListener(new MyExceptionListener());
             connection.addConnectionListener(ConnectionManager.getInstance());
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-            Queue queue = session.createQueue(brokerParams.getQueueName());
+            Queue queue = session.createQueue(brokerParams.getSourceAddr());
             messageConsumer = session.createConsumer(queue);
             messageConsumer.setMessageListener(new AmqpMessageListener(brokerParams, triggers));
 

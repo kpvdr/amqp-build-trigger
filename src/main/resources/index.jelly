@@ -1,4 +1,5 @@
 <?jelly escape-by-default='true'?>
 <div>
-    This plugin allows jobs to connect to one or more AMQP brokers, receive messages from them, and trigger a build when the message is received.
+    This plugin allows jobs to connect to one or more AMQP sources (often brokers with a queue or topic),
+    receive messages from them, and trigger a build when the message is received.
 </div>

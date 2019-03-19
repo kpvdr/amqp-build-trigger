@@ -27,7 +27,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 public class AmqpBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.ParameterizedJob> extends Trigger<T> {
     private static final String KEY_PARAM_NAME = "name";
     private static final String KEY_PARAM_VALUE = "value";
-    private static final String PLUGIN_NAME = "AMQP Build Trigger";
+    private static final String PLUGIN_NAME = "[AMQP Build Trigger] - Trigger builds using AMQP 1.0 messages";
     private List<AmqpBrokerParams> amqpBrokerParamsList = new ArrayList<AmqpBrokerParams>();
 
     @DataBoundConstructor
