@@ -15,7 +15,8 @@
         <jenkins.version>2.7.3</jenkins.version>
         <java.level>8</java.level>
     </properties>
-    <description>Jenkins plugin that triggers a build based on messages received from an AMQP message broker.</description>
+    <name>AMQP Build Trigger Plugin</name>
+    <description>Trigger a build when a message received from an AMQP message source (usually a queue or topic).</description>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -42,7 +43,6 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-    <name>AMQP Build Trigger Plugin</name>
     <dependencies>
     	<dependency>
     		<groupId>org.apache.commons</groupId>
