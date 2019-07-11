@@ -7,9 +7,6 @@ import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 
-//import javax.jms.Connection;
-import javax.jms.ConnectionMetaData;
-//import javax.jms.ConnectionFactory;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -22,7 +19,6 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.qpid.jms.JmsConnection;
 import org.apache.qpid.jms.JmsConnectionFactory;
-//import org.apache.qpid.jms.JmsConnectionMetaData;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -128,9 +124,6 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
                     connection.setExceptionListener(new MyExceptionListener());
                     connection.start();
 
-                    // Get connection properties
-                    ConnectionMetaData connectionProperties = connection.getMetaData();
-
                     Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                     Queue queue = session.createQueue(sourceAddr);
                     MessageConsumer messageConsumer = session.createConsumer(queue);
@@ -138,8 +131,7 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
                     messageConsumer.close();
                     session.close();
                     connection.close();
-                    return FormValidation.ok("Connection ok [" + connectionProperties.getJMSProviderName() +
-                    		                 " v" + connectionProperties.getProviderVersion() + "]");
+                    return FormValidation.ok("OK");
                 } catch (javax.jms.JMSException e) {
                     return FormValidation.error(e.toString());
                 }
