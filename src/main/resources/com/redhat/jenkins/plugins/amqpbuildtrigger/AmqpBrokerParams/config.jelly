@@ -1,16 +1,16 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <f:entry title="${%Server URL}" field="url">
-      <f:textbox />
+      <f:textbox checkMethod="post"/>
     </f:entry>
     <f:entry title="${%User}" field="user">
-      <f:textbox />
+      <f:textbox checkMethod="post"/>
     </f:entry>
     <f:entry title="${%Password}" field="password">
-      <f:password/>
+      <f:password checkMethod="post"/>
     </f:entry>
     <f:entry title="${%Source address}" field="sourceAddr">
-      <f:textbox />
+      <f:textbox checkMethod="post"/>
     </f:entry>
     <f:validateButton title="${%Test Source}" progress="${%Testing...}" method="testConnection" with="url,user,password,sourceAddr" />
 </j:jelly>

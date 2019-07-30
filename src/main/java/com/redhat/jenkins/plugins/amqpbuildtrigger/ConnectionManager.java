@@ -5,7 +5,7 @@ import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 
 import java.net.URI;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class ConnectionManager implements JmsConnectionListener {
     }
 
     public ConnectionManager() {
-        connectionMap = new HashMap<String, AmqpConnection>();
+        connectionMap = new ConcurrentHashMap<String, AmqpConnection>();
     }
 
     protected void addBuildTrigger(AmqpBuildTrigger trigger) {

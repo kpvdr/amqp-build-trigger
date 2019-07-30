@@ -23,6 +23,10 @@ import org.apache.qpid.jms.JmsConnectionFactory;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
+
+// Temporary, until enforcer issues with org.apache.commons.validator can be sorted out
+import com.redhat.jenkins.plugins.validator.UrlValidator;
 
 public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
     private static final String DISPLAY_NAME = "AMQP server parameters";
@@ -41,7 +45,7 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
     }
 
     public String getUrl() {
-        return url;
+        return StringUtils.strip(StringUtils.stripToNull(url), "/");
     }
 
     public String getUser() {
@@ -85,7 +89,12 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
     }
 
     public boolean isValid() {
-        return url != null && !url.isEmpty() && sourceAddr != null && !sourceAddr.isEmpty();
+        if (url != null && !url.isEmpty()) {
+            UrlValidator urlValidator = new UrlValidator();
+            if (!urlValidator.isValid(getUrl()))
+                return false;
+        }
+        return sourceAddr != null && !sourceAddr.isEmpty();
     }
 
     @Override
@@ -105,13 +114,15 @@ public class AmqpBrokerParams implements Describable<AmqpBrokerParams> {
             return Jenkins.getInstance().getExtensionList(AmqpBrokerUrlDescriptor.class);
         }
 
+        @POST
         public FormValidation doTestConnection(@QueryParameter("url") String url,
         		                               @QueryParameter("user") String user,
         		                               @QueryParameter("passowrd") String password,
         		                               @QueryParameter("sourceAddr") String sourceAddr) throws ServletException {
+            Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
             String uri = StringUtils.strip(StringUtils.stripToNull(url), "/");
-            // TODO: (GitHub Issue #2) Validate URL
-            if (uri != null /*&& urlValidator.isValid(uri)*/) {
+            UrlValidator urlValidator = new UrlValidator();
+            if (uri != null && urlValidator.isValid(uri)) {
                 try {
                     JmsConnectionFactory factory = new JmsConnectionFactory(uri);
                     JmsConnection connection;

@@ -39,6 +39,6 @@ Finally, click the **Save** button at the bottom of the form to save the setting
 
 **NOTE:** It is possible to quickly send trigger messages using `qpid-send` through a broker running on localhost as follows (to which the trigger must be configured to listen):
 ```
-qpid-send -a <queue-name> -m1
+qpid-send [-b <broker-url>] -a <queue-name> -m1
 ```
-where `<queue-name>` is replaced by the queue name configured in the **Source Address** field for your project.
+where `<broker-url>` is the broker URL (defaults to `localhost`), and `<queue-name>` is replaced by the queue name configured in the **Source Address** field for your project. To get help, use `qpid-send -h` or `qpid-send --help`.

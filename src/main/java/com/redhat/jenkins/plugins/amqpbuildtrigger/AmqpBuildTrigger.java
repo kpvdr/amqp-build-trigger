@@ -12,7 +12,7 @@ import hudson.model.StringParameterValue;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
 import jenkins.model.Jenkins;
@@ -28,7 +28,7 @@ public class AmqpBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Parame
     private static final String KEY_PARAM_NAME = "name";
     private static final String KEY_PARAM_VALUE = "value";
     private static final String PLUGIN_NAME = "[AmqpBuildTrigger] - Trigger builds using AMQP 1.0 messages";
-    private List<AmqpBrokerParams> amqpBrokerParamsList = new ArrayList<AmqpBrokerParams>();
+    private List<AmqpBrokerParams> amqpBrokerParamsList = new CopyOnWriteArrayList<AmqpBrokerParams>();
 
     @DataBoundConstructor
     public AmqpBuildTrigger(List<AmqpBrokerParams> amqpBrokerParamsList) {
@@ -69,7 +69,7 @@ public class AmqpBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Parame
     }
 
     private List<ParameterValue> getUpdatedParameters(JSONArray jsonParameters, List<ParameterValue> definedParameters) {
-        List<ParameterValue> newParams = new ArrayList<ParameterValue>();
+        List<ParameterValue> newParams = new CopyOnWriteArrayList<ParameterValue>();
         for (ParameterValue defParam : definedParameters) {
             for (int i = 0; i < jsonParameters.size(); i++) {
                 JSONObject jsonParam = jsonParameters.getJSONObject(i);
@@ -82,7 +82,7 @@ public class AmqpBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Parame
     }
 
     private List<ParameterValue> getDefinitionParameters(Job<?, ?> project) {
-        List<ParameterValue> parameters = new ArrayList<ParameterValue>();
+        List<ParameterValue> parameters = new CopyOnWriteArrayList<ParameterValue>();
         ParametersDefinitionProperty properties = project.getProperty(ParametersDefinitionProperty.class);
         if (properties != null) {
             for (ParameterDefinition paramDef : properties.getParameterDefinitions()) {

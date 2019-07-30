@@ -13,6 +13,9 @@ import javax.jms.Session;
 import org.apache.qpid.jms.JmsConnection;
 import org.apache.qpid.jms.JmsConnectionFactory;
 
+//Temporary, until enforcer issues with org.apache.commons.validator can be sorted out
+import com.redhat.jenkins.plugins.validator.UrlValidator;
+
 public class AmqpConnection {
     private static final Logger LOGGER = Logger.getLogger(AmqpBuildTrigger.class.getName());
     private final Set<AmqpBuildTrigger> triggers = new CopyOnWriteArraySet<AmqpBuildTrigger>();
@@ -54,27 +57,34 @@ public class AmqpConnection {
     }
 
     public boolean open(AmqpMessageListener listener) {
-        try {
-            JmsConnectionFactory factory = new JmsConnectionFactory(brokerParams.getUrl());
-            if (brokerParams.getUser().isEmpty() || brokerParams.getPassword().getPlainText().isEmpty()) {
-                connection = (JmsConnection)factory.createConnection();
-            } else {
-                connection = (JmsConnection)factory.createConnection(brokerParams.getUser(), brokerParams.getPassword().getPlainText());
-            }
-            connection.setExceptionListener(new MyExceptionListener());
-            connection.addConnectionListener(ConnectionManager.getInstance());
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        String url = brokerParams.getUrl();
+        UrlValidator urlValidator = new UrlValidator();
+        if (url != null && urlValidator.isValid(url)) {
+	        try {
+	            JmsConnectionFactory factory = new JmsConnectionFactory(url);
+	            if (brokerParams.getUser().isEmpty() || brokerParams.getPassword().getPlainText().isEmpty()) {
+	                connection = (JmsConnection)factory.createConnection();
+	            } else {
+	                connection = (JmsConnection)factory.createConnection(brokerParams.getUser(), brokerParams.getPassword().getPlainText());
+	            }
+	            connection.setExceptionListener(new MyExceptionListener());
+	            connection.addConnectionListener(ConnectionManager.getInstance());
+	            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-            Queue queue = session.createQueue(brokerParams.getSourceAddr());
-            messageConsumer = session.createConsumer(queue);
-            messageConsumer.setMessageListener(new AmqpMessageListener(brokerParams, triggers));
+	            Queue queue = session.createQueue(brokerParams.getSourceAddr());
+	            messageConsumer = session.createConsumer(queue);
+	            messageConsumer.setMessageListener(new AmqpMessageListener(brokerParams, triggers));
 
-            connection.start();
+	            connection.start();
 
-            LOGGER.info("Created listener for broker \"" + brokerParams.toString() + "\" containing " + triggers.size() +
-                    (triggers.size() == 1 ? " trigger" : " triggers") + " " + triggers.toString());
-        } catch (JMSException e) {
-            LOGGER.severe(e.getMessage());
+	            LOGGER.info("Created listener for broker \"" + brokerParams.toString() + "\" containing " + triggers.size() +
+	                    (triggers.size() == 1 ? " trigger" : " triggers") + " " + triggers.toString());
+	        } catch (JMSException e) {
+	            LOGGER.severe(e.getMessage());
+	            return false;
+	        }
+        } else {
+            LOGGER.warning("Invalid Server URL \"" + url + "\", unable to open connection");
             return false;
         }
         return true;
