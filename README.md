@@ -1,3 +1,6 @@
+# NOTICE: THIS IS NO LONGER THE CANONICAL SOURCE
+## This project is now hosted on the [Jenkins Plugins](https://wiki.jenkins.io/display/JENKINS/AMQP+Build+Trigger+Plugin) site.
+
 # AMQP Build Trigger for Jenkins
 This Jenkins plugin will trigger builds when AMQP messages are received from AMQP message sources (typically a broker with a queue or topic). Each job may specify one or more AMQP sources from which to recieve messages. If any AMQP message is received from any of the configured sources, then a build is triggered.
 
